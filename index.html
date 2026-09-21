@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Heizlast-Risikocheck</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@80..100,500..800&family=Source+Sans+3:wght@400;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="src/styles.css">
+<style>[hidden]{display:none!important}body{margin:0}</style>
+</head>
+<body>
+<script>
+  // Einbettungs-Konfiguration
+  window.HRC_CONFIG = { exports: true, contactUrl: null, draftBadges: true };
+</script>
+<div class="wrap">
+  <header class="top">
+    <h1>Heizlast-Risikocheck</h1>
+    <div class="toolbar">
+      <span class="sample" id="projTag" hidden></span>
+      <button class="btn" id="sampleBtn" type="button">Beispiel laden</button>
+      <button class="btn" id="resetBtn" type="button">Zurücksetzen</button>
+    </div>
+  </header>
+
+  <!-- Fragebogen: eine Karte pro Frage, Auswertung erst am Schluss -->
+  <div class="qgrid" id="qview">
+  <form id="f" class="card qcard" autocomplete="off">
+    <div class="stephead">
+      <div class="eyebrow" id="stepCount" aria-live="polite"></div>
+      <div class="stepbar"><span id="stepBar"></span></div>
+    </div>
+
+    <div class="steps">
+      <div class="step" id="q_name" data-text="projekt" data-recap="Projekt">
+        <div class="group-label">Projekt</div>
+        <p class="lede">Wie teuer wird eine fehlende oder fehlerhafte Heizlastberechnung in Ihrem Projekt? Beantworten Sie die Fragen Schritt für Schritt. Am Schluss sehen Sie, wie nötig eine Second Opinion ist, und erhalten das Risikoregister.</p>
+        <h2 class="qtitle" tabindex="-1"><label for="projekt">Wie heisst das Projekt?</label></h2>
+        <p class="qhelp">Der Name erscheint in der Auswertung und im Export.</p>
+        <input class="text" type="text" id="projekt" name="projekt" maxlength="80" placeholder="z. B. MFH Seestrasse 12">
+        <p class="privacy">Ihre Angaben werden nur lokal in Ihrem Browser gespeichert und nicht an einen Server übertragen.</p>
+      </div>
+
+      <div id="ctxSteps"></div>   <!-- Projektkontext: aus CONTEXT_QUESTIONS erzeugt -->
+
+      <div class="step" id="q_typ" data-radio="typ" data-recap="Projektart" hidden>
+        <div class="group-label">Tragweite</div>
+        <h2 class="qtitle" tabindex="-1">Um was für ein Projekt handelt es sich?</h2>
+        <div class="opts">
+          <label class="opt"><input type="radio" name="typ" id="typ_b" value="B"><span>Bestand</span></label>
+          <label class="opt"><input type="radio" name="typ" id="typ_n" value="N"><span>Neubau</span></label>
+        </div>
+      </div>
+
+      <div class="step" id="q_b1" data-radio="b1" data-recap="Wärmeerzeuger ersetzt" hidden>
+        <div class="group-label">Tragweite</div>
+        <h2 class="qtitle" tabindex="-1">Wird der Wärmeerzeuger ersetzt?</h2>
+        <div class="opts">
+          <label class="opt"><input type="radio" name="b1" id="b1_y" value="y"><span>Ja</span></label>
+          <label class="opt"><input type="radio" name="b1" id="b1_n" value="n"><span>Nein</span></label>
+        </div>
+      </div>
+      <div class="step" id="q_huelle" data-radio="huelle" data-recap="Gebäudehülle" hidden>
+        <div class="group-label">Tragweite</div>
+        <h2 class="qtitle" tabindex="-1">In welchem Zustand ist die Gebäudehülle?</h2>
+        <div class="opts">
+          <label class="opt"><input type="radio" name="huelle" id="h_u" value="u"><span>Unverändert</span></label>
+          <label class="opt"><input type="radio" name="huelle" id="h_t" value="t" data-tip-item="B3"><span>(Teil-)Sanierung</span></label>
+        </div>
+      </div>
+      <div class="step" id="q_verbrauch" data-radio="verbr" data-recap="Verbrauchsdaten" hidden>
+        <div class="group-label">Tragweite</div>
+        <h2 class="qtitle" tabindex="-1">Liegen mehrjährige Verbrauchsdaten vor?</h2>
+        <p class="qhelp">Gemessen und witterungsbereinigt, z. B. Brennstoffabrechnungen der letzten 3 Jahre.</p>
+        <div class="opts">
+          <label class="opt"><input type="radio" name="verbr" id="v_k" value="k" data-tip-item="B2a"><span>Ja, bekannt</span></label>
+          <label class="opt"><input type="radio" name="verbr" id="v_u" value="u" data-tip-item="B2b"><span>Nein, unbekannt</span></label>
+        </div>
+      </div>
+      <div class="step" id="q_ampB" data-recap="Risikoverstärker" hidden>
+        <div class="group-label">Tragweite · Risikoverstärker · Mehrfachauswahl</div>
+        <h2 class="qtitle" tabindex="-1">Was kommt im Projekt zusätzlich vor?</h2>
+        <p class="qhelp">Alle zutreffenden auswählen. Ohne Auswahl geht es direkt weiter.</p>
+        <div class="opts col" id="ampB"></div>
+      </div>
+
+      <div class="step" id="q_dimN" data-recap="Dimensionierung" hidden>
+        <div class="group-label">Tragweite</div>
+        <h2 class="qtitle" tabindex="-1">Was wird auf Basis der Heizlast dimensioniert?</h2>
+        <p class="qhelp">Alle zutreffenden auswählen.</p>
+        <div class="opts col" id="dimN"></div>
+      </div>
+      <div class="step" id="q_ampN" data-recap="Risikoverstärker" hidden>
+        <div class="group-label">Tragweite · Risikoverstärker · Mehrfachauswahl</div>
+        <h2 class="qtitle" tabindex="-1">Was kommt im Projekt zusätzlich vor?</h2>
+        <p class="qhelp">Alle zutreffenden auswählen. Ohne Auswahl geht es direkt weiter.</p>
+        <div class="opts col" id="ampN"></div>
+      </div>
+      <div id="probSteps"></div>  <!-- Belastbarkeit der Heizlast: aus PROB_QUESTIONS erzeugt -->
+    </div>
+
+    <div class="stepnav">
+      <button class="btn" type="button" id="prevBtn">Zurück</button>
+      <button class="btn primary" type="button" id="nextBtn">Weiter</button>
+    </div>
+  </form>
+  <aside class="card toc" aria-label="Ihre Antworten">
+    <div class="eyebrow">Ihre Antworten</div>
+    <ol id="tocList"></ol>
+  </aside>
+  </div>
+
+  <!-- Auswertung: erst nach der letzten Frage sichtbar -->
+  <div id="result" hidden>
+    <div class="grid">
+      <div class="col">
+        <!-- Second Opinion: immer sichtbar, die Kernaussage der Auswertung -->
+        <div class="cta" id="soCard">
+          <div class="eyebrow">Second Opinion <span class="draft" hidden>ENTWURF</span></div>
+          <p class="sopct"><span id="soPct"></span><span class="soname" id="soName"></span></p>
+          <div class="sobar" aria-hidden="true"><span id="soBar"></span><i style="left:40%"></i><i style="left:60%"></i><i style="left:80%"></i></div>
+          <div class="soscale" aria-hidden="true"><span style="left:40%">empfohlen</span><span style="left:60%">stark empfohlen</span><span style="left:80%">zwingend</span></div>
+          <p id="ctaText"></p>
+          <p class="sonote" id="soNote" hidden>Laut Ihren Angaben wurde die Heizlast bereits unabhängig geprüft.</p>
+          <button class="btn primary" type="button" id="ctaBtn">Second Opinion anfragen</button>
+        </div>
+      </div>
+      <div class="col">
+        <aside class="sum card" id="sum" aria-live="polite">
+          <div class="sumband"></div>
+          <div class="sumbody">
+            <div class="eyebrow">Risiko: Höchste Stufe</div>
+            <div class="bigdots" id="sDots"></div>
+            <p class="lvltext" id="sLevel"></p>
+            <div class="irr" id="sIrr" hidden><b>Irreversibel</b><span>Die Prüfung muss vor Bohrung bzw. Bestellung abgeschlossen sein. Eine spätere Korrektur ist ausgeschlossen.</span></div>
+            <dl class="facts" id="sFacts"></dl>
+            <div class="note" id="sNote" hidden></div>
+          </div>
+        </aside>
+        <div class="card recap">
+          <div class="eyebrow">Ihre Angaben</div>
+          <dl class="facts" id="recap"></dl>
+          <button class="btn" type="button" id="editBtn">Antworten ändern</button>
+        </div>
+      </div>
+    </div>
+
+    <section class="reg">
+      <div class="reghead">
+        <div>
+          <div class="eyebrow" id="regMeta"></div>
+          <h2>Risikomatrix und Risikoregister</h2>
+        </div>
+        <div class="toolbar">
+          <button class="btn" type="button" id="copyBtn">Tabelle kopieren (Excel)</button>
+          <button class="btn" type="button" id="csvBtn" hidden>CSV herunterladen</button>
+          <button class="btn" type="button" id="printBtn" hidden>Drucken / PDF</button>
+        </div>
+      </div>
+
+      <!-- Matrix in voller Breite, direkt über dem Register: jede Register-ID sitzt in ihrer Zelle -->
+      <div class="card matrixcard" id="mxCard">
+        <div class="mxgrid">
+          <div>
+            <div class="eyebrow">Risikomatrix <span class="draft" hidden>ENTWURF</span></div>
+            <div class="matrix" id="matrix" role="img"></div>
+            <div class="mxlegend" id="mxLegend"></div>
+          </div>
+          <div class="mxwhy" id="mxWhy"></div>
+        </div>
+      </div>
+
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>ID</th><th>Kriterium</th><th>Stufe</th><th>Risikoklasse</th><th>Risiko</th><th>Konsequenz</th><th>Empfohlene Handlung</th></tr></thead>
+          <tbody id="tb"></tbody>
+        </table>
+      </div>
+
+      <form class="card ownform" id="ownForm" autocomplete="off">
+        <div class="eyebrow">Eigenes Risiko ergänzen <span class="draft" hidden>ENTWURF</span></div>
+        <p class="qhelp">Projektspezifische Risiken rund um die Heizlast erfassen und bewerten. Sie erscheinen in Register und Matrix und fliessen in den Second-Opinion-Wert ein.</p>
+        <div class="ownfields">
+          <label class="grow">Bezeichnung <input type="text" id="ownName" maxlength="80" required placeholder="z. B. Nutzung noch nicht definiert"></label>
+          <label class="grow2">Beschreibung / Konsequenz <input type="text" id="ownText" maxlength="240" placeholder="optional"></label>
+          <label>Tragweite <select id="ownT"></select></label>
+          <label>Wahrscheinlichkeit <select id="ownW"></select></label>
+          <button class="btn primary" type="submit">Hinzufügen</button>
+        </div>
+      </form>
+
+      <div class="legend" id="legend"></div>
+      <footer>
+        <p><b>Bewertung.</b> Jedes Kriterium erhält eine Stufe von 1 bis 5 Punkten. Das ist die Tragweite eines Fehlers. Treffen mehrere Kriterien zu, gilt die höchste Stufe. Ab zwei gleichzeitigen Risikoverstärkern wird sie um eine Stufe angehoben, höchstens auf Stufe 5.</p>
+        <p><b>Wahrscheinlichkeit.</b> Sie ergibt sich aus der Belastbarkeit der Heizlast: Methode, Urheber, Grundlagen und Prüfung. Je schwächer die Berechnung abgestützt ist, desto höher die Wahrscheinlichkeit eines Auslegungsfehlers.</p>
+        <p><b>Risikoklasse.</b> Wahrscheinlichkeit mal Tragweite ergibt einen Wert von 1 bis 25 und damit die Klasse Gering, Mittel, Hoch oder Kritisch. Eigene Risiken werden mit ihrer eigenen Bewertung eingetragen.</p>
+        <p><b>Second Opinion.</b> Der Prozentwert entspricht dem höchsten Wert aller Risiken, bezogen auf das Maximum von 25. Jedes weitere Risiko ab Klasse Hoch erhöht ihn um 4 Prozentpunkte. Ab 40 % ist eine Zweitmeinung empfohlen, ab 60 % stark empfohlen, ab 80 % zwingend.</p>
+        <p><b>Irreversibel.</b> Eingriffe, die sich später nicht mehr korrigieren lassen, sind unabhängig von der Stufe gekennzeichnet.</p>
+        <p><b>Normbezug.</b> Heizleistungsbedarf nach SIA 384/2, Erdwärmesonden nach SIA 384/6.</p>
+        <p>Das Tool ersetzt keine Heizlastberechnung. Es zeigt, wie viel Prüftiefe sie verdient.</p>
+      </footer>
+    </section>
+  </div>
+</div>
+<div class="toast" id="toast" hidden></div>
+<script src="src/risk-model.js"></script>
+<script src="src/app.js"></script>
+<!-- Review-Werkzeug, nur aktiv mit ?annotate in der URL -->
+<script src="src/annotate.js"></script>
+</body>
+</html>
