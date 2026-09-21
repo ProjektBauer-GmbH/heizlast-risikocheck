@@ -55,12 +55,13 @@ Ordner auf den Webserver kopieren (z. B. `/tools/heizlast-risikocheck/`), dann:
 `index.html?annotate` öffnen, «＋ Anmerkung» klicken, Element anklicken, Kommentar speichern. «Batch kopieren» legt alle Anmerkungen als Markdown in die Zwischenablage. Ohne `?annotate` ist das Werkzeug unsichtbar.
 
 ## Mitarbeiten
-Voraussetzung: GitHub-Konto mit Schreibzugriff auf dieses Repository und [Git](https://git-scm.com/) oder [GitHub Desktop](https://desktop.github.com/).
+Voraussetzung: GitHub-Konto mit Schreibzugriff auf dieses Repository (Einladung per E-Mail annehmen) und [Git](https://git-scm.com/) oder [GitHub Desktop](https://desktop.github.com/). Mit GitHub Desktop geht alles ohne Kommandozeile: «Clone repository», ändern, «Commit», «Push».
 
 ```bash
-# 1. Projekt holen (einmalig)
-git clone git@github.com:ProjektBauer-GmbH/heizlast-risikocheck.git
+# 1. Projekt holen (einmalig). Beim ersten Mal fragt Git nach der GitHub-Anmeldung.
+git clone https://github.com/ProjektBauer-GmbH/heizlast-risikocheck.git
 cd heizlast-risikocheck
+# Mit eingerichtetem SSH-Schlüssel alternativ: git clone git@github.com:ProjektBauer-GmbH/heizlast-risikocheck.git
 
 # 2. Vor jeder Arbeit den neusten Stand holen
 git pull
