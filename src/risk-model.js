@@ -85,7 +85,7 @@ const CONTEXT_QUESTIONS = [
     {v:"efh",  label:"Einfamilienhaus"},
     {v:"mfh",  label:"Mehrfamilienhaus"},
     {v:"gew",  label:"Büro / Gewerbe"},
-    {v:"oeff", label:"Schule / öffentliche Baute"},
+    {v:"oeff", label:"Schule / öffentliche Bauten"},
     {v:"spez", label:"Spezialnutzung", sub:"z. B. Spital, Labor, Hallenbad"}]},
   {id:"phase", recap:"Projektphase", title:"In welcher Phase steht das Projekt?", help:"Phasen nach SIA 112.", opts:[
     {v:"vor",  label:"Vorstudie / Vorprojekt", sub:"Phasen 2–31"},
@@ -148,9 +148,10 @@ const riskClass = (w, t) => RISKCLASSES.find(c => w * t <= c.max);
 // Er übersetzt die abstrakte Stufe in die Frage, die den Nutzer interessiert: Braucht es eine Zweitmeinung?
 const SO_SCORE_HIGH = 10;        // ab diesem Wert (Klasse Hoch) zählt ein weiteres Risiko für den Zuschlag
 const SO_EXTRA = 4;              // Prozentpunkte je weiterem Risiko ab Klasse Hoch
+// Schwellen folgen den Risikoklassen: Hoch (10–15 von 25) = 40–60 % empfohlen, Kritisch (ab 16) = ab 64 % stark empfohlen.
 const SO_LEVELS = [
   {min:80, name:"zwingend",           text:"Aufgrund Ihrer Angaben ist eine unabhängige Zweitmeinung zur Heizlast zwingend, bevor bestellt oder gebohrt wird."},
-  {min:60, name:"stark empfohlen",    text:"Aufgrund Ihrer Angaben ist eine unabhängige Zweitmeinung zur Heizlast notwendig."},
+  {min:64, name:"stark empfohlen",    text:"Aufgrund Ihrer Angaben ist eine unabhängige Zweitmeinung zur Heizlast notwendig."},
   {min:40, name:"empfohlen",          text:"Aufgrund Ihrer Angaben empfehlen wir eine unabhängige Zweitmeinung zur Heizlast."},
   {min:20, name:"optional",           text:"Eine Zweitmeinung ist für dieses Projekt nicht zwingend. Bei Unsicherheit prüfen wir Ihre Heizlast gern."},
   {min:0,  name:"nicht erforderlich", text:"Für dieses Projekt ist keine Zweitmeinung nötig. Bei Fragen zur Heizlast sind wir gern für Sie da."}

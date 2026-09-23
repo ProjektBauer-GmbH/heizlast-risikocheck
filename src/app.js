@@ -155,7 +155,7 @@ function renderSteps(){
   document.querySelectorAll(".step").forEach(el => el.hidden = el.id !== list[cur]);
   // Pfadlänge steht erst fest, wenn Projektart, Hülle und Methode beantwortet sind. Bis dahin nur «Frage x».
   const fixed = typ && (typ === "N" || val("huelle") !== null) && val(PROB_QUESTIONS[0].id) !== null;
-  $("stepCount").textContent = `Frage ${cur+1}` + (fixed ? ` von ${list.length}` : "");
+  $("stepCount").textContent = `Frage ${cur+1}` + (fixed ? ` von ${list.length}` : "") + ` · ${$(list[cur]).dataset.recap}`;
   $("stepBar").style.width = `${Math.round((cur+1)/(fixed ? list.length : STEPS_MAX)*100)}%`;
   $("prevBtn").hidden = cur === 0;
   $("nextBtn").textContent = typ && cur === list.length-1 ? "Auswertung anzeigen" : "Weiter";
@@ -183,13 +183,24 @@ function renderResult(){
   $("ctaText").textContent = so.text;
   $("soNote").hidden = val("w_pruef") !== "unabh";
 
-  $("sum").style.setProperty("--lvl", total ? lvlVar(total) : "var(--line)");
-  $("sDots").innerHTML = dots(total);
-  $("sLevel").textContent = total ? `Stufe ${total} von 5 · ${LEVELNAME[total]}` : "Kein Kriterium erfasst";
+  // Gesamtrisiko = höchster Wert (Tragweite × Wahrscheinlichkeit), dieselbe Grösse wie der Prozentwert
+  const top = rows[0], rc = top ? RISKCLASSES.find(c => ev.best <= c.max) : null;
+  const topW = top ? top.w : ev.w, topT = top ? (ev.best === ev.w*ev.treeTotal ? ev.treeTotal : top.t) : 0;
+  $("soCalc").textContent = top ? `Tragweite ${topT} × Wahrscheinlichkeit ${topW} = ${ev.best} von 25 Punkten` : "";
+  $("sum").style.setProperty("--lvl", rc ? lvlVar(rc.lvl) : "var(--line)");
+  $("sLevel").textContent = rc ? `Risikoklasse ${rc.name} · ${ev.best} von 25` : "Kein Kriterium erfasst";
+  $("sParts").innerHTML = top ? `
+    <dt>Tragweite</dt><dd>${dots(topT,'dots')} ${topT} von 5 · ${LEVELNAME[topT]}</dd>
+    <dt>Wahrscheinlichkeit</dt><dd>${dots(topW,'dots')} ${topW} von 5 · ${PROBNAME[topW]}</dd>` : "";
+  $("sWhy").textContent = !top ? "" : topT >= 4 && topW <= 2
+    ? "Die Tragweite eines Fehlers ist hoch, die Wahrscheinlichkeit dafür aber gering, weil die Heizlast belastbar ist. Deshalb fällt der Second-Opinion-Wert tiefer aus als die Tragweite allein vermuten lässt."
+    : topT <= 2 && topW >= 4
+    ? "Die Heizlast ist wenig belastbar, ein Fehler hätte in diesem Projekt aber begrenzte Folgen."
+    : "";
   $("sIrr").hidden = !irr;
   const lead = rows.filter(r => r.lvl === Math.max(...rows.map(x => x.lvl))), rest = rows.filter(r => !lead.includes(r));
   $("sFacts").innerHTML = rows.length ? `
-    <dt>Massgebend</dt><dd>${lead.map(r => esc(label(r))).join(" · ")}</dd>${rest.length ? `
+    <dt>Höchste Tragweite</dt><dd>${lead.map(r => esc(label(r))).join(" · ")}</dd>${rest.length ? `
     <dt>Weitere Kriterien</dt><dd>${rest.map(r => esc(label(r))).join(" · ")}</dd>` : ""}` : "";
   const note = $("sNote");
   note.hidden = !cumul;

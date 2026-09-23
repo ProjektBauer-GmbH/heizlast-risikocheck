@@ -6,7 +6,7 @@
 <title>Heizlast-Risikocheck</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@80..100,500..800&family=Source+Sans+3:wght@400;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
-<link rel="stylesheet" href="src/styles.css">
+<link rel="stylesheet" href="src/styles.css?v=2.2">
 <style>[hidden]{display:none!important}body{margin:0}</style>
 </head>
 <body>
@@ -35,7 +35,7 @@
     <div class="steps">
       <div class="step" id="q_name" data-text="projekt" data-recap="Projekt">
         <div class="group-label">Projekt</div>
-        <p class="lede">Wie teuer wird eine fehlende oder fehlerhafte Heizlastberechnung in Ihrem Projekt? Beantworten Sie die Fragen Schritt für Schritt. Am Schluss sehen Sie, wie nötig eine Second Opinion ist, und erhalten das Risikoregister.</p>
+        <p class="lede">Welches Risiko trägt Ihr Projekt, wenn die Heizlastberechnung fehlt oder fehlerhaft ist? Der Risikocheck bewertet Tragweite und Wahrscheinlichkeit, führt die Risiken in einem Register zusammen und liefert Ihnen eine Entscheidungsbasis, ob eine Second Opinion nötig ist.</p>
         <h2 class="qtitle" tabindex="-1"><label for="projekt">Wie heisst das Projekt?</label></h2>
         <p class="qhelp">Der Name erscheint in der Auswertung und im Export.</p>
         <input class="text" type="text" id="projekt" name="projekt" maxlength="80" placeholder="z. B. MFH Seestrasse 12">
@@ -78,8 +78,8 @@
           <label class="opt"><input type="radio" name="verbr" id="v_u" value="u" data-tip-item="B2b"><span>Nein, unbekannt</span></label>
         </div>
       </div>
-      <div class="step" id="q_ampB" data-recap="Risikoverstärker" hidden>
-        <div class="group-label">Tragweite · Risikoverstärker · Mehrfachauswahl</div>
+      <div class="step" id="q_ampB" data-recap="Zusätzlich im Projekt" hidden>
+        <div class="group-label">Tragweite · Mehrfachauswahl</div>
         <h2 class="qtitle" tabindex="-1">Was kommt im Projekt zusätzlich vor?</h2>
         <p class="qhelp">Alle zutreffenden auswählen. Ohne Auswahl geht es direkt weiter.</p>
         <div class="opts col" id="ampB"></div>
@@ -91,8 +91,8 @@
         <p class="qhelp">Alle zutreffenden auswählen.</p>
         <div class="opts col" id="dimN"></div>
       </div>
-      <div class="step" id="q_ampN" data-recap="Risikoverstärker" hidden>
-        <div class="group-label">Tragweite · Risikoverstärker · Mehrfachauswahl</div>
+      <div class="step" id="q_ampN" data-recap="Zusätzlich im Projekt" hidden>
+        <div class="group-label">Tragweite · Mehrfachauswahl</div>
         <h2 class="qtitle" tabindex="-1">Was kommt im Projekt zusätzlich vor?</h2>
         <p class="qhelp">Alle zutreffenden auswählen. Ohne Auswahl geht es direkt weiter.</p>
         <div class="opts col" id="ampN"></div>
@@ -119,8 +119,9 @@
         <div class="cta" id="soCard">
           <div class="eyebrow">Second Opinion <span class="draft" hidden>ENTWURF</span></div>
           <p class="sopct"><span id="soPct"></span><span class="soname" id="soName"></span></p>
-          <div class="sobar" aria-hidden="true"><span id="soBar"></span><i style="left:40%"></i><i style="left:60%"></i><i style="left:80%"></i></div>
-          <div class="soscale" aria-hidden="true"><span style="left:40%">empfohlen</span><span style="left:60%">stark empfohlen</span><span style="left:80%">zwingend</span></div>
+          <p class="socalc" id="soCalc"></p>
+          <div class="sobar" aria-hidden="true"><span id="soBar"></span><i style="left:40%"></i><i style="left:64%"></i><i style="left:80%"></i></div>
+          <div class="soscale" aria-hidden="true"><span style="left:40%">empfohlen</span><span style="left:64%">stark empfohlen</span><span style="left:80%">zwingend</span></div>
           <p id="ctaText"></p>
           <p class="sonote" id="soNote" hidden>Laut Ihren Angaben wurde die Heizlast bereits unabhängig geprüft.</p>
           <button class="btn primary" type="button" id="ctaBtn">Second Opinion anfragen</button>
@@ -130,9 +131,10 @@
         <aside class="sum card" id="sum" aria-live="polite">
           <div class="sumband"></div>
           <div class="sumbody">
-            <div class="eyebrow">Risiko: Höchste Stufe</div>
-            <div class="bigdots" id="sDots"></div>
+            <div class="eyebrow">Risiko: Tragweite × Wahrscheinlichkeit</div>
             <p class="lvltext" id="sLevel"></p>
+            <dl class="parts" id="sParts"></dl>
+            <p class="action" id="sWhy"></p>
             <div class="irr" id="sIrr" hidden><b>Irreversibel</b><span>Die Prüfung muss vor Bohrung bzw. Bestellung abgeschlossen sein. Eine spätere Korrektur ist ausgeschlossen.</span></div>
             <dl class="facts" id="sFacts"></dl>
             <div class="note" id="sNote" hidden></div>
@@ -195,7 +197,7 @@
         <p><b>Bewertung.</b> Jedes Kriterium erhält eine Stufe von 1 bis 5 Punkten. Das ist die Tragweite eines Fehlers. Treffen mehrere Kriterien zu, gilt die höchste Stufe. Ab zwei gleichzeitigen Risikoverstärkern wird sie um eine Stufe angehoben, höchstens auf Stufe 5.</p>
         <p><b>Wahrscheinlichkeit.</b> Sie ergibt sich aus der Belastbarkeit der Heizlast: Methode, Urheber, Grundlagen und Prüfung. Je schwächer die Berechnung abgestützt ist, desto höher die Wahrscheinlichkeit eines Auslegungsfehlers.</p>
         <p><b>Risikoklasse.</b> Wahrscheinlichkeit mal Tragweite ergibt einen Wert von 1 bis 25 und damit die Klasse Gering, Mittel, Hoch oder Kritisch. Eigene Risiken werden mit ihrer eigenen Bewertung eingetragen.</p>
-        <p><b>Second Opinion.</b> Der Prozentwert entspricht dem höchsten Wert aller Risiken, bezogen auf das Maximum von 25. Jedes weitere Risiko ab Klasse Hoch erhöht ihn um 4 Prozentpunkte. Ab 40 % ist eine Zweitmeinung empfohlen, ab 60 % stark empfohlen, ab 80 % zwingend.</p>
+        <p><b>Second Opinion.</b> Der Prozentwert entspricht dem höchsten Wert aller Risiken, bezogen auf das Maximum von 25. Jedes weitere Risiko ab Klasse Hoch erhöht ihn um 4 Prozentpunkte. Ab 40 % ist eine Zweitmeinung empfohlen (Risikoklasse Hoch), ab 64 % stark empfohlen (Risikoklasse Kritisch), ab 80 % zwingend.</p>
         <p><b>Irreversibel.</b> Eingriffe, die sich später nicht mehr korrigieren lassen, sind unabhängig von der Stufe gekennzeichnet.</p>
         <p><b>Normbezug.</b> Heizleistungsbedarf nach SIA 384/2, Erdwärmesonden nach SIA 384/6.</p>
         <p>Das Tool ersetzt keine Heizlastberechnung. Es zeigt, wie viel Prüftiefe sie verdient.</p>
@@ -204,9 +206,9 @@
   </div>
 </div>
 <div class="toast" id="toast" hidden></div>
-<script src="src/risk-model.js"></script>
-<script src="src/app.js"></script>
+<script src="src/risk-model.js?v=2.2"></script>
+<script src="src/app.js?v=2.2"></script>
 <!-- Review-Werkzeug, nur aktiv mit ?annotate in der URL -->
-<script src="src/annotate.js"></script>
+<script src="src/annotate.js?v=2.2"></script>
 </body>
 </html>
