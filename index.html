@@ -6,13 +6,13 @@
 <title>Heizlast-Risikocheck</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@80..100,500..800&family=Source+Sans+3:wght@400;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
-<link rel="stylesheet" href="src/styles.css?v=2.3">
+<link rel="stylesheet" href="src/styles.css?v=2.4">
 <style>[hidden]{display:none!important}body{margin:0}</style>
 </head>
 <body>
 <script>
   // Einbettungs-Konfiguration
-  window.HRC_CONFIG = { exports: true, contactUrl: null, draftBadges: true };
+  window.HRC_CONFIG = { exports: true, contactUrl: null, draftBadges: false };
 </script>
 <div class="wrap">
   <header class="top">
@@ -175,7 +175,7 @@
 
       <div class="tablewrap">
         <table>
-          <thead><tr><th>ID</th><th>Kriterium</th><th>Stufe</th><th>Risikoklasse</th><th>Risiko</th><th>Konsequenz</th><th>Empfohlene Handlung</th></tr></thead>
+          <thead><tr><th>ID</th><th>Kriterium</th><th>Tragweite</th><th>Wahrscheinlichkeit</th><th>Risikoklasse</th><th>Risiko</th><th>Konsequenz</th><th>Empfohlene Handlung</th></tr></thead>
           <tbody id="tb"></tbody>
         </table>
       </div>
@@ -206,9 +206,9 @@
   </div>
 </div>
 <div class="toast" id="toast" hidden></div>
-<script src="src/risk-model.js?v=2.3"></script>
-<script src="src/app.js?v=2.3"></script>
+<script src="src/risk-model.js?v=2.4"></script>
+<script src="src/app.js?v=2.4"></script>
 <!-- Review-Werkzeug, nur aktiv mit ?annotate in der URL -->
-<script src="src/annotate.js?v=2.3"></script>
+<script src="src/annotate.js?v=2.4"></script>
 </body>
 </html>

@@ -76,7 +76,7 @@ const ITEMS = {
 // ein Vorschlag und müssen vom Auftraggeber geprüft werden. Solange DRAFT = true, zeigt die UI das Badge «ENTWURF».
 // Die Stufe aus dem Entscheidungsbaum (oben) bleibt unverändert und heisst in der Matrix «Tragweite».
 // =====================================================================================
-const DRAFT = true;
+const DRAFT = false;   // Badges «ENTWURF» ausgeblendet (Entscheid 23.09.2026); die fachliche Prüfung der Entwurfsinhalte bleibt offen
 
 // Projektkontext: rein informativ (Auswertung, Export). Fliesst NICHT in die Bewertung ein,
 // damit «Grosses / komplexes Gebäude» (N7) nicht doppelt zählt.

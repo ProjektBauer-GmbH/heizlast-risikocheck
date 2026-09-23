@@ -165,6 +165,8 @@ td.crit small{display:block;font-weight:400;color:var(--muted)}
 tr.lead td{background:color-mix(in srgb,var(--c) 7%,transparent)}
 tr.hl td{background:color-mix(in srgb,var(--accent) 10%,transparent)}
 td.rc b{display:block;color:var(--c)}
+td.prob{min-width:150px}
+td.prob small{display:block;font-size:12px;color:var(--muted);margin-top:4px}
 td.rc small{font:500 12px/1.4 var(--mono);color:var(--muted);white-space:nowrap}
 ul.cons{margin:0;padding:0;list-style:none}
 ul.cons li{padding:0 0 6px;margin:0 0 6px;border-bottom:1px dashed var(--line)}

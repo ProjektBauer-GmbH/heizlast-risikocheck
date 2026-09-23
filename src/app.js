@@ -132,7 +132,9 @@ function probability(){
 // Die Register-ID ist projektspezifisch (R-01 …, nach Wert absteigend). Die Modellcodes (B6 usw.) bleiben intern.
 function evaluate(){
   const prob = probability();
-  const tree = selected().map(code => ({code, ...ITEMS[code], w: prob.w, t: ITEMS[code].lvl}));
+  // Bei Tragweite 1 ist keine Heizlast nötig, ein Fehler darin ist also nicht möglich: Wahrscheinlichkeit 1 (Review 23.09.2026)
+  const wFor = t => t <= 1 ? 1 : prob.w;
+  const tree = selected().map(code => ({code, ...ITEMS[code], w: wFor(ITEMS[code].lvl), t: ITEMS[code].lvl}));
   const own = custom.map((c,i) => ({code:"own"+i, own:true, idx:i, name:c.name, risk:c.text, cons:"", lvl:c.t, t:c.t, w:c.w, irr:false}));
   const rows = [...tree, ...own].map(r => ({...r, score: r.w*r.t, rc: riskClass(r.w, r.t)}))
     .sort((a,b) => b.score - a.score || b.lvl - a.lvl)
@@ -143,7 +145,7 @@ function evaluate(){
   const treeTotal = cumul ? Math.min(5, treeMax + CUMUL_BONUS) : treeMax;
   const total = Math.max(treeTotal, ...own.map(r => r.t));               // höchste Stufe über alles
   // Second-Opinion-Wert: höchster Wert / 25, plus Zuschlag je weiterem Risiko ab Klasse Hoch
-  const best = Math.max(0, prob.w*treeTotal, ...rows.map(r => r.score));
+  const best = Math.max(0, wFor(treeTotal)*treeTotal, ...rows.map(r => r.score));
   const extra = Math.max(0, rows.filter(r => r.score >= SO_SCORE_HIGH).length - 1);
   const pct = rows.length ? Math.min(100, Math.round(best/25*100) + SO_EXTRA*extra) : 0;
   return {rows, treeMax, treeTotal, total, amps, cumul, irr: rows.some(r => r.irr), best, extra, pct, ...prob};
@@ -185,7 +187,7 @@ function renderResult(){
 
   // Gesamtrisiko = höchster Wert (Tragweite × Wahrscheinlichkeit), dieselbe Grösse wie der Prozentwert
   const top = rows[0], rc = top ? RISKCLASSES.find(c => ev.best <= c.max) : null;
-  const topW = top ? top.w : ev.w, topT = top ? (ev.best === ev.w*ev.treeTotal ? ev.treeTotal : top.t) : 0;
+  const topW = top ? top.w : ev.w, topT = top ? (ev.best === (ev.treeTotal <= 1 ? 1 : ev.w)*ev.treeTotal ? ev.treeTotal : top.t) : 0;
   $("soCalc").textContent = top ? `Tragweite ${topT} × Wahrscheinlichkeit ${topW} = ${ev.best} von 25 Punkten` : "";
   $("sum").style.setProperty("--lvl", rc ? lvlVar(rc.lvl) : "var(--line)");
   $("sLevel").textContent = rc ? `Risikoklasse ${rc.name} · ${ev.best} von 25` : "Kein Kriterium erfasst";
@@ -215,11 +217,12 @@ function renderResult(){
       <td class="id">${r.id}</td>
       <td class="crit">${esc(r.name)}${r.sub?`<small>${r.sub}</small>`:''}${r.amp?'<span class="amp">VERSTÄRKER</span>':''}${r.ph?'<span class="ph">PLATZHALTER</span>':''}${r.own?`<span class="ph">EIGENES RISIKO</span><button type="button" class="linkbtn" data-del="${r.idx}">Entfernen</button>`:''}</td>
       <td>${dots(r.lvl,'dots')}</td>
-      <td class="rc" style="--c:${lvlVar(r.rc.lvl)}"><b>${r.rc.name}</b><small>${r.w} × ${r.t} = ${r.score}</small></td>
+      <td class="prob">${dots(r.w,'dots')}<small>${r.own ? "Ihre Einschätzung" : r.t <= 1 ? "Keine Heizlast nötig, daher kein Fehler möglich" : ev.drivers.length ? esc(ev.drivers.join(", ")) : "Heizlast belastbar"}</small></td>
+      <td class="rc" style="--c:${lvlVar(r.rc.lvl)}"><b>${r.rc.name}</b><small>${r.t} × ${r.w} = ${r.score}</small></td>
       <td class="risk"><b>${LEVELNAME[r.lvl]}${r.irr?' (irreversibel)':''}</b>${esc(r.risk)}</td>
       <td>${r.cons ? `<ul class="cons">${splitCons(r.cons).map(c => `<li>${c}</li>`).join("")}</ul>` : ""}</td>
       <td>${ACTIONS[r.lvl]}</td>
-    </tr>`).join("") : `<tr><td colspan="7" class="empty">Keine Risiken erfasst.</td></tr>`;
+    </tr>`).join("") : `<tr><td colspan="8" class="empty">Keine Risiken erfasst.</td></tr>`;
 
   const d = new Date().toLocaleDateString("de-CH");
   $("regMeta").textContent = `${projekt() || "Projekt"} · ${typ==="B"?"Bestand":"Neubau"} · Stand ${d}`;
@@ -252,7 +255,7 @@ function renderMatrix(ev){
   $("mxWhy").innerHTML = !rows.length ? "" : `
     <h3>So entsteht die Position</h3>
     <p><b>Tragweite (waagrecht).</b> Sie ist die Stufe des jeweiligen Kriteriums aus dem Register${rows.some(r => r.own) ? ", bei eigenen Risiken Ihre Einschätzung" : ""}.${raised ? ` Weil ${amps.length} Risikoverstärker zusammentreffen, steigt die Gesamtstufe von ${treeMax} auf ${treeTotal} (Σ).` : ""}</p>
-    <p><b>Wahrscheinlichkeit (senkrecht).</b> Sie folgt aus Ihren Angaben zur Belastbarkeit der Heizlast und gilt für alle Kriterien aus dem Fragebogen:</p>
+    <p><b>Wahrscheinlichkeit (senkrecht).</b> Sie folgt aus Ihren Angaben zur Belastbarkeit der Heizlast und gilt für alle Kriterien aus dem Fragebogen. Ausnahme: Bei Tragweite 1 ist keine Heizlast nötig, dort gilt Wahrscheinlichkeit 1.</p>
     <table class="why"><tbody>${parts.map(p => `<tr><td>${p.q}</td><td>${p.a}</td><td>${p.pts === null ? "direkt" : "+" + p.pts}</td></tr>`).join("")}
       <tr class="sum"><td colspan="2">${direct ? "Ohne Heizlast gilt direkt die höchste Stufe" : `Summe ${pts} von 8 Punkten (${PROB_STEPS.map(([m,l],i) => { const lo = i ? PROB_STEPS[i-1][0]+1 : 0; return `${lo === m ? m : lo+"–"+m} → ${l}`; }).join(", ")})`}</td><td>Stufe ${w}</td></tr></tbody></table>
     <p><b>Second Opinion ${pct} %.</b> Höchster Wert: ${top.id} ${esc(top.name)} mit ${raised && w*treeTotal === best ? `${w} × ${treeTotal} (Σ)` : `${top.w} × ${top.t}`} = ${best} von 25, das sind ${Math.round(best/25*100)} %.${extra ? ` Dazu kommen ${SO_EXTRA*extra} Prozentpunkte für ${extra === 1 ? "1 weiteres Risiko" : extra + " weitere Risiken"} ab Klasse Hoch.` : ""}</p>`;
