@@ -29,18 +29,18 @@ Wurzel: Projektrisiko «Fehlende / fehlerhafte Heizlast».
 - B1 Ersatz Wärmeerzeuger (Ja/Nein) – rein informativ; die Gebäudehülle wird **unabhängig von B1** abgefragt (Entscheid 21.09.2026, Abweichung vom Baum):
   - B2 unverändert → Verbrauch bekannt ★ (B2a) / unbekannt ★★ (B2b)
   - B3 (Teil-)Sanierung Hülle ★★★
-- Risikoverstärker (Mehrfachauswahl): B4 Nachrüsten FBH ★★★★ · B5 Fernwärme ★★★★(!) · B6 Erdsondenfeld ★★★★★(!) · B7 Grundwasser-WP ★★★★★(!) *(Platzhaltertext)*
+- Risikoverstärker (Mehrfachauswahl): B4 Nachrüsten FBH ★★★★ · B5 Fernwärme ★★★★(!) · B6 Erdsondenfeld ★★★★★(!) · B7 Grundwasser-Sondenbohrung ★★★★★(!) *(Platzhaltertext)*
 
 **Neubau**
 - Dimensionen (Mehrfachauswahl, «Abfrage aller Dimensionen»): N1 Wärmeerzeuger ★★★ · N2 Leitungsnetz ★★ · N3 Wärmeabgabe FBH ★★★
-- Risikoverstärker: N4 TABS ★★★★(!) · N5 Erdsondenfeld ★★★★★(!) · N6 Fernwärme ★★★★(!) · N7 Grosses/komplexes Gebäude ★★★★ · N8 Grundwasser-WP ★★★★★(!) *(Platzhaltertext)*
+- Risikoverstärker: N4 TABS ★★★★(!) · N5 Erdsondenfeld ★★★★★(!) · N6 Fernwärme ★★★★(!) · N7 Grosses/komplexes Gebäude ★★★★ · N8 Grundwasser-Sondenbohrung ★★★★★(!) *(Platzhaltertext)*
 
 **Kombination:** `max()` – die höchste Stufe ist massgebend; **Kumulation:** ab 2 gleichzeitigen Risikoverstärkern Gesamtstufe +1, gedeckelt auf 5 (`CUMUL_MIN_AMPS`/`CUMUL_BONUS` in `risk-model.js`; Registerzeilen behalten ihre eigene Stufe, Export enthält eine Zeile «Gesamt»). Risiko- und Konsequenztexte aller Treffer werden gesammelt (Tabelle, nach Stufe absteigend sortiert).
 
 **Stufen → Handlung**
 1 Keine Heizlast nötig, andere Methoden ausreichend · 2 Heizlast rechnen, normale Qualitätssicherung (im PDF «QS», auf Anweisung ausgeschrieben) · 3 Plausibilisierung im 4-Augen-Prinzip · 4 Second Opinion empfohlen · 5 Unabhängige Freigabe zwingend vor Bohrung/Bestellung.
 
-**(!) Irreversibel:** eigenes Flag, unabhängig von der Sternzahl. Gilt für Erdsonde, Grundwasser-WP, TABS **und Fernwärme** (Entscheid 21.09.2026: der Baum gilt, nicht die Legende). Prüfung muss vor Bohrung/Bestellung abgeschlossen sein.
+**(!) Irreversibel:** eigenes Flag, unabhängig von der Sternzahl. Gilt für Erdsonde, Grundwasser-Sondenbohrung, TABS **und Fernwärme** (Entscheid 21.09.2026: der Baum gilt, nicht die Legende). Prüfung muss vor Bohrung/Bestellung abgeschlossen sein.
 
 ## Ausbau v2.x: ENTWURF, nicht aus dem PDF (unterer Block in `risk-model.js`)
 Der Check wurde bewusst substanzieller gemacht. Prinzip: **Der Entscheidungsbaum bleibt unangetastet**; seine Stufe ist die «Tragweite» und bestimmt die empfohlene Handlung je Registerzeile (`ACTIONS`). Dazu kommt:
@@ -67,7 +67,7 @@ iFrame-Einbettung: Das Tool sendet `postMessage({type:"hrc-height", height})` an
 
 ## Offene fachliche Punkte (mit Auftraggeber klären, NICHT eigenmächtig umsetzen)
 1. **Kühllast fehlt.** Tool wurde als Heiz- *und* Kühllast-Tool gedacht; Modell deckt nur Heizlast ab. Entweder zweiter Baum (SIA 382/2) oder Tool bleibt explizit «Heizlast».
-2. **Fachtext Grundwasser-WP fehlt.** B7/N8 sind mit `ph:true` und `PLACEHOLDER_TEXT` umgesetzt (UI zeigt Badge «PLATZHALTER»). Risiko-/Konsequenztext vom Auftraggeber einholen, dann `ph` entfernen.
+2. **Fachtext Grundwasser-Sondenbohrung fehlt.** B7/N8 sind mit `ph:true` und `PLACEHOLDER_TEXT` umgesetzt (UI zeigt Badge «PLATZHALTER»). Risiko-/Konsequenztext vom Auftraggeber einholen, dann `ph` entfernen.
 3. **Legende im PDF nachziehen.** Die Legende nennt (!) nur für Erdsonde/Grundwasser und TABS; entschieden ist, dass auch Fernwärme (!) trägt. Quelle sollte angepasst werden, damit PDF und Tool übereinstimmen.
 4. **Rolle von B1.** Seit die Hülle immer abgefragt wird, beeinflusst B1 die Bewertung nicht mehr. Frage behalten (Kontext für Export) oder streichen?
 5. **Entwurfsinhalte v2.x validieren.** Punkte/Schwellen der Wahrscheinlichkeit, Matrixklassen, Second-Opinion-Formel und -Schwellen (40/60/80 %), Zuschlag je weiterem Risiko, Tooltip-Texte.

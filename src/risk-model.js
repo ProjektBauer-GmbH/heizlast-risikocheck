@@ -1,6 +1,6 @@
 // Fachliches Modell: Stufen, Handlungen, Kriterien.
 // Texte stammen 1:1 aus docs/risk-assessment-heizlast.pdf (Stand 14.09.2026).
-// Ausnahme: B7/N8 (Grundwasser-WP) stehen nur in der Legende des PDF, nicht im Baum – Texte sind Platzhalter.
+// Ausnahme: B7/N8 (Grundwasser-Sondenbohrung, im PDF «Grundwasser») stehen nur in der Legende des PDF, nicht im Baum – Texte sind Platzhalter.
 // (!) bei Fernwärme (B5/N6): Entscheid 21.09.2026 – der Baum gilt, Flag bleibt gesetzt.
 // Auf Anweisung (21.09.2026) sind Gedankenstriche in zwei Texten (B3, N4) durch Punkte ersetzt und «QS» ausgeschrieben; der Wortlaut ist sonst unverändert.
 // Änderungen an Fachinhalt NUR hier.
@@ -41,7 +41,7 @@ const ITEMS = {
   B6:{name:"Erdsondenfeld", lvl:5, irr:true, amp:true,
     risk:"Die Last bestimmt Erzeugerleistung sowie Anzahl und Bohrtiefe der Sonden; der Eingriff in den Untergrund ist teuer und irreversibel.",
     cons:"Zu kurz dimensioniert → thermisches Regenerationsdefizit, über Jahre sinkende Soletemperatur bis zur Vereisung des Sondennahbereichs; zu lang → unwirtschaftliche Bohrmehrkosten."},
-  B7:{name:"Grundwasser-Wärmepumpe", lvl:5, irr:true, amp:true, ph:true,
+  B7:{name:"Grundwasser-Sondenbohrung", lvl:5, irr:true, amp:true, ph:true,
     risk:PLACEHOLDER_TEXT,
     cons:PLACEHOLDER_TEXT},
   N1:{name:"Dimensionierung Wärmeerzeuger", lvl:3, irr:false,
@@ -65,7 +65,7 @@ const ITEMS = {
   N7:{name:"Grosses / komplexes Gebäude", sub:"komplexe Geometrie, heterogene Nutzung, unterschiedliche Solltemperaturen und Nutzungszeiten, viele Sonderbauteile", lvl:4, irr:false, amp:true,
     risk:"Bei komplexer Geometrie und heterogener Nutzung greifen Richt- und Erfahrungswerte nicht.",
     cons:"Unterschiedliche Solltemperaturen und Nutzungszeiten sowie ein hoher Anteil an Sonderbauteilen lassen belastbare Benchmarks fehlen → einzelne Räume oder Gebäudeteile werden unter- oder überversorgt."},
-  N8:{name:"Grundwasser-Wärmepumpe", lvl:5, irr:true, amp:true, ph:true,
+  N8:{name:"Grundwasser-Sondenbohrung", lvl:5, irr:true, amp:true, ph:true,
     risk:PLACEHOLDER_TEXT,
     cons:PLACEHOLDER_TEXT}
 };

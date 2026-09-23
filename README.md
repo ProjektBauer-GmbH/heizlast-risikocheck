@@ -26,7 +26,7 @@ npx serve .
 ## Was noch zu prüfen ist
 Alles, was nicht aus dem PDF in `docs/` stammt, trägt im Tool das Badge **ENTWURF**: Fragen zur Belastbarkeit der Heizlast, Punkte und Schwellen, Risikomatrix, Second-Opinion-Formel, Tooltip-Texte. Diese Inhalte stehen gesammelt im unteren Block von `src/risk-model.js`. Nach der fachlichen Freigabe dort `DRAFT = false` setzen, dann verschwinden die Badges.
 
-Weitere offene Punkte (Fachtext Grundwasser-Wärmepumpe, Definition «Grosses / komplexes Gebäude», Kühllast) stehen in `CLAUDE.md` unter «Offene fachliche Punkte».
+Weitere offene Punkte (Fachtext Grundwasser-Sondenbohrung, Definition «Grosses / komplexes Gebäude», Kühllast) stehen in `CLAUDE.md` unter «Offene fachliche Punkte».
 
 ## Konfiguration
 In `index.html`:
@@ -71,7 +71,7 @@ git checkout -b fachtexte-grundwasser
 
 # 4. Dateien bearbeiten, im Browser prüfen, dann einchecken
 git add -A
-git commit -m "Fachtext Grundwasser-Wärmepumpe ergänzt"
+git commit -m "Fachtext Grundwasser-Sondenbohrung ergänzt"
 git push -u origin fachtexte-grundwasser
 ```
 
